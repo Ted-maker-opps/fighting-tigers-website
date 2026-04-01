@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ── Favicon ───────────────────────────────────────── -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <!-- ── SEO ─────────────────────────────────────────── -->
+  <title>Start Your Website Setup — Fighting Tigers</title>
+  <meta name="description" content="Fill in a quick brief and we'll get to work. Tell us what you need and we'll build your website preview from day one.">
+  <link rel="canonical" href="https://fightingtigers.london/setup">
+
+  <!-- ── Open Graph ────────────────────────────────────── -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fightingtigers.london/setup">
+  <meta property="og:title" content="Start Your Website Setup — Fighting Tigers">
+  <meta property="og:description" content="A few details is all it takes. Complete your brief and we'll handle everything from here.">
+  <meta property="og:image" content="https://fightingtigers.london/assets/og-image.jpg">
+
+  <!-- ── Twitter ───────────────────────────────────────── -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://fightingtigers.london/setup">
+  <meta name="twitter:title" content="Start Your Website Setup — Fighting Tigers">
+  <meta name="twitter:description" content="Tell us what you need. We'll take it from there.">
+  <meta name="twitter:image" content="https://fightingtigers.london/assets/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ft-cyan: #57d1e4;
+      --ft-bg:   #000;
+    }
+
+    html, body {
+      width: 100%;
+      background: var(--ft-bg);
+      font-family: 'Montserrat', Arial, sans-serif;
+      overflow-x: clip;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    @font-face {
+      font-family: 'Glitz';
+      src:
+        url('./assets/fonts/Glitz.woff2') format('woff2'),
+        url('./assets/fonts/Glitz.woff')  format('woff');
+      font-weight: normal;
+      font-style:  normal;
+      font-display: block;
+    }
+
+    /* ═══════════════════════════════════════════════
+       PILL NAV — exact match of main site
+    ═══════════════════════════════════════════════ */
+    .pill-nav-wrap {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pill-nav {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      height: 58px;
+      background: rgba(14, 16, 26, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 100px;
+      overflow: hidden;
+      pointer-events: auto;
+      backdrop-filter: blur(22px) saturate(1.6);
+      -webkit-backdrop-filter: blur(22px) saturate(1.6);
+      box-shadow:
+        0 6px 40px rgba(0, 0, 0, 0.50),
+        inset 0 1px 0 rgba(255, 255, 255, 0.13),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .pill-nav__item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 0 32px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.38);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color 0.28s ease, text-shadow 0.28s ease;
+      z-index: 2;
+    }
+
+    .pill-nav__item:hover {
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(255, 255, 255, 0.55);
+    }
+
+    .pill-nav__item.is-active {
+      color: #ffffff;
+      text-shadow: 0 0 14px rgba(255, 255, 255, 0.38);
+    }
+
+    /* moving highlight behind active item */
+    .pill-nav__spot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      transition:
+        transform 0.50s cubic-bezier(0.4, 0, 0.2, 1),
+        width     0.50s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pill-nav__spot::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56%;
+      height: 1.5px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.90) 25%,
+        rgba(255, 255, 255, 0.90) 75%,
+        transparent 100%
+      );
+    }
+
+    .pill-nav__spot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 85% 130% at 50% -10%,
+        rgba(255, 255, 255, 0.09) 0%,
+        rgba(255, 255, 255, 0.03) 55%,
+        transparent 100%
+      );
+    }
+
+    @media (max-width: 640px) {
+      .pill-nav-wrap { top: 16px; }
+      .pill-nav { height: 50px; }
+      .pill-nav__item { font-size: 10px; padding: 0 20px; letter-spacing: 0.07em; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       1. INTRO SECTION
+    ═══════════════════════════════════════════════ */
+    .setup-intro {
+      position: relative;
+      padding: 148px 48px 72px;
+      text-align: center;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* Ambient glow from top */
+    .setup-intro::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      height: 320px;
+      background: radial-gradient(ellipse at 50% 0%,
+        rgba(87, 209, 228, 0.09) 0%,
+        rgba(60, 160, 210, 0.05) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    /* Thin top edge accent */
+    .setup-intro::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30%;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(87, 209, 228, 0.40) 30%,
+        rgba(87, 209, 228, 0.40) 70%,
+        transparent 100%
+      );
+    }
+
+    .setup-intro__inner {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .setup-intro__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ft-cyan);
+      margin-bottom: 26px;
+      opacity: 0.80;
+    }
+
+    .setup-intro__eyebrow::before,
+    .setup-intro__eyebrow::after {
+      content: '';
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.65;
+    }
+
+    .setup-intro__heading {
+      font-family: 'Glitz', sans-serif;
+      font-weight: normal;
+      font-size: clamp(36px, 6vw, 80px);
+      line-height: 1.05;
+      letter-spacing: 0.04em;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    .setup-intro__sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(14px, 1.3vw, 17px);
+      font-weight: 400;
+      line-height: 1.72;
+      color: rgba(255, 255, 255, 0.72);
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    .setup-intro__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 100px;
+      background: rgba(87, 209, 228, 0.07);
+      border: 1px solid rgba(87, 209, 228, 0.20);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(87, 209, 228, 0.85);
+    }
+
+    .setup-intro__badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--ft-cyan);
+      opacity: 0.85;
+      animation: pulse-dot 2.4s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50%       { opacity: 0.45; transform: scale(0.7); }
+    }
+
+    @media (max-width: 640px) {
+      .setup-intro { padding: 120px 24px 56px; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       2. CONDENSED PROCESS STEPS
+    ═══════════════════════════════════════════════ */
+    .setup-steps {
+      padding: 56px 48px 64px;
+      background: #000;
+    }
+
+    .setup-steps__inner {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .setup-steps__eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.22);
+      text-align: center;
+      display: block;
+      margin-bottom: 44px;
+    }
+
+    .setup-steps__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      position: relative;
+    }
+
+    /* Connecting line through number circles */
+    .setup-steps__grid::before {
+      content: '';
+      position: absolute;
+      top: 21px; /* half of 44px circle */
+      left: calc(12.5% + 22px); /* right edge of first circle */
+      right: calc(12.5% + 22px);
+      height: 1px;
+      background: linear-gradient(90deg,
+        rgba(87, 209, 228, 0.28) 0%,
+        rgba(87, 209, 228, 0.12) 50%,
+        rgba(87, 209, 228, 0.28) 100%
+      );
+      pointer-events: none;
+    }
+
+    .setup-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .setup-step__num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(10, 10, 18, 1);
+      border: 1px solid rgba(87, 209, 228, 0.28);
+      box-shadow: 0 0 18px rgba(87, 209, 228, 0.08) inset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Glitz', sans-serif;
+      font-size: 17px;
+      font-weight: normal;
+      color: var(--ft-cyan);
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .setup-step__title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: rgba(255, 255, 255, 0.88);
+      line-height: 1.4;
+      margin-bottom: 9px;
+    }
+
+    .setup-step__desc {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.62);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 800px) {
+      .setup-steps { padding: 48px 24px 56px; }
+      .setup-steps__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 44px 20px;
+      }
+      .setup-steps__grid::before { display: none; }
+      .setup-step { padding: 0 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .setup-steps__grid {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════
+       3. REASSURANCE STRIP
+    ═══════════════════════════════════════════════ */
+    .setup-reassure {
+      padding: 0 48px 64px;
+      background: #000;
+    }
+
+    .setup-reassure__inner {
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .setup-reassure__track {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.015);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+
+    .setup-reassure__item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 30px 20px;
+      position: relative;
+    }
+
+    .setup-reassure__item + .setup-reassure__item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 18%;
+      height: 64%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .setup-reassure__icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(87, 209, 228, 0.07);
+      border: 1px solid rgba(87, 209, 228, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+      color: var(--ft-cyan);
+    }
+
+    .setup-reassure__label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 800px) {
+      .setup-reassure { padding: 0 24px 52px; }
+      .setup-reassure__track {
+        flex-direction: column;
+        border-radius: 16px;
+      }
+      .setup-reassure__item + .setup-reassure__item::before {
+        top: 0; left: 16%; width: 68%; height: 1px;
+      }
+      .setup-reassure__item { padding: 24px 20px; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       4. FORM SECTION
+    ═══════════════════════════════════════════════ */
+    .setup-form {
+      padding: 0 48px 80px;
+      background: #000;
+      position: relative;
+    }
+
+    /* Subtle glow centred above the card */
+    .setup-form::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 55%;
+      height: 240px;
+      background: radial-gradient(ellipse at 50% 50%,
+        rgba(87, 209, 228, 0.055) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    .setup-form__inner {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .setup-form__eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.20);
+      text-align: center;
+      display: block;
+      margin-bottom: 22px;
+    }
+
+    .setup-form__card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      padding: 48px 48px 40px;
+      backdrop-filter: blur(20px) saturate(1.1);
+      -webkit-backdrop-filter: blur(20px) saturate(1.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top accent line — thin cyan edge */
+    .setup-form__card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 38%;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(87, 209, 228, 0.38) 30%,
+        rgba(87, 209, 228, 0.38) 70%,
+        transparent 100%
+      );
+    }
+
+    /* Very subtle inner glow at top of card */
+    .setup-form__card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: radial-gradient(ellipse at 50% 0%,
+        rgba(87, 209, 228, 0.04) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    .tally-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    .tally-wrapper iframe {
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .setup-form { padding: 0 16px 64px; }
+      .setup-form__card { padding: 32px 20px 28px; border-radius: 16px; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       5. FAQ SECTION
+    ═══════════════════════════════════════════════ */
+    .setup-faq {
+      padding: 0 48px 100px;
+      background: #000;
+      border-bottom-left-radius: 64px;
+      border-bottom-right-radius: 64px;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.50);
+    }
+
+    .setup-faq__inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .setup-faq__eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.20);
+      text-align: center;
+      display: block;
+      margin-bottom: 36px;
+    }
+
+    .setup-faq__item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 24px 0;
+    }
+
+    .setup-faq__item:first-of-type {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .setup-faq__q {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+    }
+
+    .setup-faq__a {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.72;
+    }
+
+    @media (max-width: 900px) {
+      .setup-faq { border-bottom-left-radius: 44px; border-bottom-right-radius: 44px; }
+    }
+
+    @media (max-width: 600px) {
+      .setup-faq { padding: 0 24px 80px; border-bottom-left-radius: 32px; border-bottom-right-radius: 32px; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER — navy panel that slides up under the
+       rounded bottom edge of the FAQ section.
+       margin-top: -64px pulls it up so the black
+       FAQ section's rounded corners curve visibly
+       against the navy background — same mechanic
+       as the contact/footer overlap on hero.html.
+    ═══════════════════════════════════════════════ */
+    .ft-footer {
+      position: relative;
+      background: #111c2e;
+      padding: 0 60px;
+      overflow: hidden;
+      z-index: 1;
+      margin-top: -64px;
+    }
+
+    .ft-footer::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,0.08) 25%,
+        rgba(255,255,255,0.08) 75%,
+        transparent 100%
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .ft-footer__wordmark {
+      position: absolute;
+      bottom: -0.18em;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Glitz', sans-serif;
+      font-weight: normal;
+      font-size: clamp(120px, 18vw, 240px);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      white-space: nowrap;
+      color: rgba(87, 209, 228, 0.16);
+      filter: blur(0.6px);
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    .ft-footer__top-gap { height: 144px; }
+
+    .ft-footer__inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr;
+      gap: 0 64px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .ft-footer__brand { display: flex; flex-direction: column; }
+
+    .ft-footer__brand-name {
+      font-family: 'Glitz', sans-serif;
+      font-weight: normal;
+      font-size: clamp(26px, 3vw, 44px);
+      line-height: 1.0;
+      letter-spacing: 0.04em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .ft-footer__brand-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.7;
+      max-width: 260px;
+    }
+
+    /* ── Typing animation — exact copy from hero.html ── */
+    .ft-footer__brand-sub::after {
+      content: '';
+      display: inline-block;
+      width: 1.5px;
+      height: 0.85em;
+      background: var(--ft-cyan);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      opacity: 0;
+    }
+    .ft-footer__brand-sub.ft-typing::after {
+      opacity: 1;
+      animation: ftCaret 0.65s ease infinite;
+    }
+    .ft-footer__brand-sub.ft-typed::after {
+      animation: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    @keyframes ftCaret {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .ft-footer__col-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.24);
+      margin-bottom: 22px;
+      display: block;
+    }
+
+    .ft-footer__nav { display: flex; flex-direction: column; }
+    .ft-footer__links { display: flex; flex-direction: column; gap: 14px; }
+    .ft-footer__links a {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.52);
+      text-decoration: none;
+      transition: color 0.25s ease;
+      width: fit-content;
+    }
+    .ft-footer__links a:hover { color: #fff; }
+
+    .ft-footer__actions { display: flex; flex-direction: column; }
+
+    .ft-footer__ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.52);
+      text-decoration: none;
+      margin-bottom: 30px;
+      align-self: flex-start;
+      transition: color 0.25s ease;
+    }
+    .ft-footer__ig:hover { color: #fff; }
+
+    .ft-footer__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 17px 30px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.24);
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.60);
+      text-decoration: none;
+      align-self: flex-start;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: color 1.0s ease, border-color 0.8s ease;
+    }
+    .ft-footer__cta > * { position: relative; z-index: 1; }
+    .ft-footer__cta::before {
+      content: '';
+      position: absolute;
+      left: 50%; bottom: 0;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #00ccff;
+      transform: translate(-50%, 50%) scale(0);
+      transform-origin: center center;
+      opacity: 0;
+      z-index: 0;
+      transition: transform 0.45s ease-in, opacity 0.32s ease-in;
+    }
+    .ft-footer__cta:hover::before {
+      transform: translate(-50%, 50%) scale(80);
+      opacity: 1;
+      transition:
+        transform 2.2s cubic-bezier(0.16, 1, 0.30, 1),
+        opacity   0.55s ease;
+    }
+    .ft-footer__cta:hover {
+      border-color: transparent;
+      color: #000;
+      transition: color 0.40s ease, border-color 0.15s ease;
+    }
+
+    .ft-footer__bottom {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 0 120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ft-footer__copy {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 900px) {
+      .ft-footer { padding: 0 32px; margin-top: -44px; }
+      .ft-footer__top-gap { height: 104px; }
+      .ft-footer__inner { grid-template-columns: 1fr 1fr; gap: 48px 40px; }
+      .ft-footer__brand { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 600px) {
+      .ft-footer { padding: 0 20px; margin-top: -32px; }
+      .ft-footer__top-gap { height: 80px; }
+      .ft-footer__inner { grid-template-columns: 1fr; gap: 36px; }
+      .ft-footer__brand { grid-column: 1; }
+      .ft-footer__bottom { padding-bottom: 80px; }
+      .ft-footer__wordmark { font-size: clamp(72px, 20vw, 140px); bottom: -0.12em; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       PILL NAV
+  ═══════════════════════════════════════════════ -->
+  <div class="pill-nav-wrap" id="pillNavWrap">
+    <nav class="pill-nav" id="pillNav" aria-label="Site navigation">
+      <a class="pill-nav__item" href="./index.html">Home</a>
+      <a class="pill-nav__item" href="./index.html#contact">Contact Us</a>
+      <a class="pill-nav__item is-active" href="#">Set Up Form</a>
+      <div class="pill-nav__spot" id="pillNavSpot" aria-hidden="true"></div>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       1. INTRO
+  ═══════════════════════════════════════════════ -->
+  <section class="setup-intro">
+    <div class="setup-intro__inner">
+      <h1 class="setup-intro__heading">Start Your<br>Website Setup</h1>
+      <p class="setup-intro__sub">A few quick details so we can build properly from day one. No commitment, no tech knowledge required, just a starting point.</p>
+      <div class="setup-intro__badge">Takes around 10–15 minutes</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       2. CONDENSED PROCESS
+  ═══════════════════════════════════════════════ -->
+  <section class="setup-steps">
+    <div class="setup-steps__inner">
+      <span class="setup-steps__eyebrow">How it works</span>
+      <div class="setup-steps__grid">
+
+        <div class="setup-step">
+          <div class="setup-step__num">1</div>
+          <h3 class="setup-step__title">Tell us what you need</h3>
+          <p class="setup-step__desc">Complete the brief below. It takes 10–15 minutes and requires no technical knowledge.</p>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step__num">2</div>
+          <h3 class="setup-step__title">Get your free preview</h3>
+          <p class="setup-step__desc">We design a tailored website mockup at no charge before you commit to anything.</p>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step__num">3</div>
+          <h3 class="setup-step__title">Approve and launch</h3>
+          <p class="setup-step__desc">Only move forward once you're happy with what you see. No pressure, no rush.</p>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step__num">4</div>
+          <h3 class="setup-step__title">Ongoing support</h3>
+          <p class="setup-step__desc">Unlimited edits, monthly maintenance, and support included every month.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       3. REASSURANCE STRIP
+  ═══════════════════════════════════════════════ -->
+  <section class="setup-reassure">
+    <div class="setup-reassure__inner">
+      <div class="setup-reassure__track">
+
+        <div class="setup-reassure__item">
+          <div class="setup-reassure__icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M7 3.8v3.2l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="setup-reassure__label">Takes 10–15 minutes</span>
+        </div>
+
+        <div class="setup-reassure__item">
+          <div class="setup-reassure__icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 11.5l10-9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <circle cx="4.5" cy="5" r="2" stroke="currentColor" stroke-width="1.3"/>
+              <circle cx="9.5" cy="9" r="2" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+          </div>
+          <span class="setup-reassure__label">No tech knowledge needed</span>
+        </div>
+
+        <div class="setup-reassure__item">
+          <div class="setup-reassure__icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M8.5 2.5l3 3-6.5 6.5H2v-3L8.5 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="setup-reassure__label">You can update details later</span>
+        </div>
+
+        <div class="setup-reassure__item">
+          <div class="setup-reassure__icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2 12c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="setup-reassure__label">We guide everything</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       4. TALLY FORM
+  ═══════════════════════════════════════════════ -->
+  <section class="setup-form" id="form">
+    <div class="setup-form__inner">
+      <span class="setup-form__eyebrow">Project brief</span>
+      <div class="setup-form__card">
+        <div class="tally-wrapper">
+          <iframe
+            data-tally-src="https://tally.so/embed/wabV19?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1"
+            loading="lazy"
+            width="100%"
+            height="600"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+            title="Set up form">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       5. FAQ
+  ═══════════════════════════════════════════════ -->
+  <section class="setup-faq">
+    <div class="setup-faq__inner">
+      <span class="setup-faq__eyebrow">Quick answers</span>
+
+      <div class="setup-faq__item">
+        <p class="setup-faq__q">What if I don't have everything ready yet?</p>
+        <p class="setup-faq__a">That's completely fine. Fill in what you know, the brief is a starting point, not a final spec. We'll work through the gaps together once we connect.</p>
+      </div>
+
+      <div class="setup-faq__item">
+        <p class="setup-faq__q">Can I change things after I submit?</p>
+        <p class="setup-faq__a">Yes. Your answers here inform the first mockup, but nothing is locked in until you approve the design. Details can evolve throughout the process.</p>
+      </div>
+
+      <div class="setup-faq__item">
+        <p class="setup-faq__q">Do I need to know exactly what I want?</p>
+        <p class="setup-faq__a">Not at all. A rough idea is enough. We ask the right questions, make informed suggestions, and guide you toward something that actually works for your business.</p>
+      </div>
+
+      <div class="setup-faq__item">
+        <p class="setup-faq__q">What happens after I submit?</p>
+        <p class="setup-faq__a">We review your brief and come back within 24 hours with next steps. If we need anything else before starting work, we'll reach out directly first.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer class="ft-footer" role="contentinfo">
+    <div class="ft-footer__wordmark" aria-hidden="true">FIGHTING TIGERS</div>
+    <div class="ft-footer__top-gap"></div>
+    <div class="ft-footer__inner">
+
+      <div class="ft-footer__brand">
+        <span class="ft-footer__brand-name">fighting tigers</span>
+        <p class="ft-footer__brand-sub" id="ftFooterTyping">Web design that earns its place. Built for businesses that want to convert, not just impress.</p>
+      </div>
+
+      <nav class="ft-footer__nav" aria-label="Footer navigation">
+        <span class="ft-footer__col-label">Navigate</span>
+        <div class="ft-footer__links">
+          <a href="#form">FAQ's</a>
+          <a href="./index.html">Home</a>
+          <a href="./index.html#contact">Contact Us</a>
+          <a href="./privacy-policy.html">Privacy Policy</a>
+          <a href="./terms-and-conditions.html">Terms and Conditions</a>
+        </div>
+      </nav>
+
+      <div class="ft-footer__actions">
+        <span class="ft-footer__col-label">Connect</span>
+        <a href="https://www.instagram.com/fightingtigers.ldn/" class="ft-footer__ig" target="_blank" rel="noopener" aria-label="Fighting Tigers on Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          @fightingtigers.ldn
+        </a>
+        <a href="#form" class="ft-footer__cta">
+          <span>Start the brief</span>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M2 6.5h9M7.5 2.5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+    <div class="ft-footer__bottom">
+      <span class="ft-footer__copy">© Fighting Tigers. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- ── Pill nav: position spot over active item ── -->
+  <script>
+    (function () {
+      'use strict';
+      var nav  = document.getElementById('pillNav');
+      var spot = document.getElementById('pillNavSpot');
+      if (!nav || !spot) return;
+
+      var active = nav.querySelector('.pill-nav__item.is-active');
+      if (!active) return;
+
+      function positionSpot(instant) {
+        var navRect  = nav.getBoundingClientRect();
+        var itemRect = active.getBoundingClientRect();
+        if (instant) {
+          spot.style.transition = 'none';
+        }
+        spot.style.width     = itemRect.width + 'px';
+        spot.style.transform = 'translateX(' + (itemRect.left - navRect.left) + 'px)';
+        if (instant) {
+          requestAnimationFrame(function () { spot.style.transition = ''; });
+        }
+      }
+
+      positionSpot(true);
+      window.addEventListener('resize', function () { positionSpot(true); });
+    }());
+  </script>
+
+  <!-- ── Footer paragraph typing animation ── -->
+  <script>
+    (function () {
+      var el = document.getElementById('ftFooterTyping');
+      if (!el) return;
+
+      var fullText = el.textContent.trim();
+      var triggered = false;
+
+      el.textContent = '';
+
+      function checkReveal() {
+        if (triggered) return;
+        /* No .contact section on this page — watch the element's own position */
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          triggered = true;
+          window.removeEventListener('scroll', checkReveal, { passive: true });
+          runTyping();
+        }
+      }
+
+      window.addEventListener('scroll', checkReveal, { passive: true });
+      checkReveal();
+
+      function runTyping() {
+        var i = 0;
+        el.classList.add('ft-typing');
+
+        function tick() {
+          if (i < fullText.length) {
+            el.textContent = fullText.slice(0, i + 1);
+            i++;
+            var delay = 36 + Math.random() * 26;
+            var ch = fullText[i - 1];
+            if (ch === '.') delay += 110;
+            else if (ch === ',') delay += 60;
+            setTimeout(tick, delay);
+          } else {
+            setTimeout(function () {
+              el.classList.remove('ft-typing');
+              el.classList.add('ft-typed');
+            }, 600);
+          }
+        }
+
+        tick();
+      }
+    })();
+  </script>
+
+  <!-- ── Tally embed ── -->
+  <script>
+    var d = document, s = d.createElement('script');
+    s.src = 'https://tally.so/widgets/embed.js';
+    s.onload = function () { if (typeof Tally !== 'undefined') Tally.loadEmbeds(); };
+    d.body.appendChild(s);
+  </script>
+
+</body>
+</html>

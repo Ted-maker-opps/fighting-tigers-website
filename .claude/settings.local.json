@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for z:*)",
+      "Bash(do unzip:*)",
+      "Bash(done)",
+      "Bash(ls logos/*/)",
+      "Bash(grep -v \"\\\\.jpg$\\\\|\\\\.jpeg$\\\\|\\\\.mp4$\\\\|\\\\.png$\\\\|phone\\\\|tell\\\\|get\\\\|approve\\\\|ongoing\\\\|living\\\\|trust\\\\|speed\\\\|late\")",
+      "Bash(ls /Users/tim/websites/assets/images/*.png /Users/tim/websites/assets/images/*.jpeg /Users/tim/websites/assets/images/*.jpg)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(find /Users/tim/websites/assets/images/ -name *.png -o -name *.jpg -o -name *.jpeg -o -name *.svg -o -name *.webp)",
+      "Bash(grep -v \"^/Users/tim/websites/assets/images/[^/]*$\")",
+      "Bash(unzip -o forbes.zip -d logos/Forbes)",
+      "Bash(unzip -o stanford.zip -d logos/Stanford)",
+      "Bash(grep -iE \"\\\\.\\(png|svg|webp|jpg\\)$\")",
+      "Bash(unzip -o \"envato concept logo.zip\")",
+      "Bash(unzip -o \"figma concept logo.zip\")",
+      "Bash(python3:*)",
+      "Bash(ls -la /Users/tim/Desktop/websites/fighting-tigers-website/*.svg /Users/tim/Desktop/websites/fighting-tigers-website/*.ico /Users/tim/Desktop/websites/fighting-tigers-website/*.png /Users/tim/Desktop/websites/fighting-tigers-website/*.webmanifest)",
+      "Bash(ls /Users/tim/Desktop/websites/fighting-tigers-website/*.html)",
+      "Bash(grep -r \"hero\\\\.html\" /Users/tim/Desktop/websites/fighting-tigers-website/*.html *.xml *.txt)"
+    ]
+  }
+}
