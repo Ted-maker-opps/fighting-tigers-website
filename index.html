@@ -122,381 +122,49 @@
     }
 
     /* ═══════════════════════════════════════════════
-       HERO WRAPPER — 130vh scroll space
-       100vh = visible hero height (sticky).
-       Extra 30vh is the parallax travel window —
-       enough for layers to move while keeping the
-       transition to the next section tight.
+       HERO WRAPPER
     ═══════════════════════════════════════════════ */
     .hero-wrapper {
       position: relative;
-      height: 108vh;
+      height: 100vh;
       margin: 0;
       padding: 0;
     }
 
     /* ═══════════════════════════════════════════════
-       HERO — sticky, clips all parallax layers
+       HERO
     ═══════════════════════════════════════════════ */
     .hero {
-      position: sticky;
-      top: 0;
+      position: relative;
       width: 100%;
       height: 100vh;
-      overflow: hidden;   /* hard clip — nothing escapes this frame */
+      overflow: hidden;
       background: #000;
     }
 
     /* ───────────────────────────────────────────────
-       PARALLAX OVERSCAN PRINCIPLE
-       ───────────────────────────────────────────────
-       Each layer uses absolute y units (vh) for GSAP
-       travel, NOT yPercent. This makes travel
-       predictable regardless of image aspect ratio.
-
-       Buffer rule: each layer's bottom offset ≥ its
-       maximum GSAP travel, so the image's bottom edge
-       is always below the hero's bottom edge.
-
-       Sky:          GSAP y: -20vh  →  top buffer: 25vh ✓
-       Back mountain: GSAP y: -30vh  →  bottom buffer: 40vh ✓
-       Front mountain: GSAP y: -12vh  →  bottom buffer: 20vh ✓
+       HERO VIDEO BACKGROUND
     ─────────────────────────────────────────────── */
-
-    /* Layer 1 · SKY — furthest, moves most */
-    .hero__sky {
-      position: absolute;
-      top: -25%;        /* 25vh above visible frame */
-      left: 0;
-      width: 100%;
-      height: 150%;     /* 150vh — 25vh buffers top & bottom */
-      z-index: 0;
-      will-change: transform;
-    }
-    .hero__sky img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      display: block;
-    }
-    .hero__sky::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 45%;
-      background: linear-gradient(
-        to bottom,
-        transparent          0%,
-        rgba(0,0,0,0.30)    35%,
-        rgba(0,0,0,0.72)    62%,
-        #000                80%,
-        #000               100%
-      );
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Layer 2 · BACK MOUNTAIN — medium movement
-       Container has explicit height so the image can use
-       object-fit: cover — cropping instead of stretching.
-       This preserves natural proportions at all sizes.
-       Container height (110vh) > GSAP travel (44vh) + visible
-       area (100vh) so the bottom edge is never exposed. */
-    .hero__mountain-back {
-      position: absolute;
-      top: 0;
-      left: -20%;
-      width: 140%;
-      height: 110vh;
-      z-index: 1;
-      will-change: transform;
-    }
-    .hero__mountain-back img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center bottom;
-      display: block;
-      /* Stacked drop-shadow traces the actual PNG alpha —
-         tight inner line + wider bloom along the ridge tops */
-      filter:
-        drop-shadow(0px -2px 5px  rgba(190, 228, 252, 0.78))
-        drop-shadow(0px -8px 16px rgba(120, 188, 240, 0.48));
-    }
-    /* Per-layer bottom fade — same principle as front mountain.
-       Softer here since the back mountain moves less. */
-    .hero__mountain-back::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      /* 92% height: covers most of the back mountain div.
-         Solid black by 50% so the lower half is always fully
-         absorbed — no gradient banding visible in the overlap zone. */
-      height: 92%;
-      background: linear-gradient(
-        to bottom,
-        transparent          0%,
-        transparent         42%,
-        rgba(0,0,0,0.35)    58%,
-        rgba(0,0,0,0.80)    70%,
-        #000                75%,
-        #000               100%
-      );
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Layer 3 · FRONT MOUNTAIN — most movement (closest)
-       bottom: -25% = 25vh below visible frame. */
-    .hero__mountain-front {
-      position: absolute;
-      bottom: -25%;
-      left: 0;
-      width: 100%;
-      z-index: 3;
-      will-change: transform;
-    }
-    /* ── Front-mountain floor ──────────────────────────────────────
-       A solid-black sibling element inside the hero, animated by
-       GSAP with the EXACT same y value as the front mountain.
-       It starts at the front mountain's initial bottom edge and
-       extends 120vh further down, so the hero gap that opens as
-       the mountain scrolls upward is permanently sealed with black.
-
-       Using a SIBLING (not a child) avoids the GPU-compositing-
-       layer boundary issue where ::before overflow on a
-       will-change:transform element is not reliably rendered
-       outside the element's layout bounds.
-
-       Initial top per breakpoint matches the front mountain bottom:
-         Desktop      bottom: -25%  → div bottom at 125vh → top: 125%
-         Tablet/small bottom:  6%   → div bottom at  94vh → top:  94%
-         Mobile       bottom: 30%   → div bottom at  70vh → top:  70%
-    ──────────────────────────────────────────────────────────────── */
-    .hero__front-floor {
-      position: absolute;
-      /* 4px upward overlap into the front mountain div eliminates
-         any sub-pixel compositing gap between the mountain's ::after
-         solid-black base and the floor's own solid-black fill. */
-      top: calc(125% - 4px);
-      left: 0;
-      right: 0;
-      height: calc(120vh + 4px);
-      /* Soft 6px fade-in at top so even if a 1-2px gap persists
-         after rounding, it blends rather than showing a hard edge. */
-      background: linear-gradient(to bottom, rgba(0,0,0,0.88) 0px, #000 6px, #000 100%);
-      z-index: 3;
-      pointer-events: none;
-      will-change: transform;
-    }
-    @media (max-width: 767px) {
-      .hero__front-floor { top: calc(94% - 4px); }
-    }
-    @media (max-width: 479px) {
-      .hero__front-floor { top: calc(70% - 4px); }
-    }
-
-    /* ── Ultra-wide composition fix: 1600px+ ──────────────────────────
-       At very wide screens the front mountain grows tall (width:100% +
-       height:auto) pushing the peaks too high in the frame.
-       Increase the negative bottom offset to lower the whole composition
-       and update the floor top to stay locked to the new position. */
-    @media (min-width: 1600px) {
-      .hero__mountain-front {
-        bottom: -36%;
-      }
-      .hero__front-floor {
-        top: calc(136% - 4px);
-      }
-      .hero__mountain-back {
-        top: 4vh;
-      }
-    }
-
-    /* Very ultra-wide: 1920px+ — push a bit further and cap
-       excessive natural image height to control peak position */
-    @media (min-width: 1920px) {
-      .hero__mountain-front {
-        bottom: -46%;
-      }
-      .hero__front-floor {
-        top: calc(146% - 4px);
-      }
-      .hero__mountain-back {
-        top: 8vh;
-      }
-      /* Clamp image height so extreme aspect ratios
-         (e.g. 21:9, 32:9) don't push peaks too far up.
-         Bottom of the image is hidden by the ::after fade
-         so cropping there is invisible. */
-      .hero__mountain-front img {
-        max-height: 84vh;
-      }
-    }
-    .hero__mountain-front img {
-      width: 100%;
-      height: auto;
-      display: block;
-      min-height: 55vh;
-      /* Front mountain is closest — strongest edge light.
-         First shadow: crisp bright rim right on the peak contour.
-         Second shadow: soft atmospheric bloom spreading outward. */
-      filter:
-        drop-shadow(0px -3px 7px  rgba(215, 242, 255, 0.95))
-        drop-shadow(0px -11px 24px rgba(140, 208, 250, 0.65));
-    }
-    /* Per-layer bottom fade — travels with the layer.
-       Dissolves the lower edge of the image into black
-       so no hard edge can peek through the main overlay
-       during parallax movement. */
-    .hero__mountain-front::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      /* Covers bottom 60% of the layer so the blend
-         starts well above the cut line.
-         Stays very light at the top (0.12) so the peak
-         and mid-section are untouched. Dissolves to full
-         black at 85% so the lower edge is completely
-         absorbed before reaching the global hero fade. */
-      height: 78%;
-      background: linear-gradient(
-        to bottom,
-        transparent          0%,
-        rgba(0,0,0,0.10)    20%,
-        rgba(0,0,0,0.50)    55%,
-        rgba(0,0,0,0.88)    72%,
-        #000                80%,
-        #000               100%
-      );
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* ───────────────────────────────────────────────
-       BACKLIGHT GLOW — sits between mountain layers
-       (above mountain-back z:1, below mountain-front z:3)
-       Simulates soft atmospheric light spilling from
-       behind the ridge — depth without drama.
-    ─────────────────────────────────────────────── */
-    .hero__glow {
+    .hero__video {
       position: absolute;
       inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      /* Kept very subtle — layer separation only, not ambient wash */
-      background:
-        radial-gradient(ellipse 110% 45% at 50% 62%,
-          rgba(130, 175, 215, 0.08) 0%,
-          transparent 60%
-        );
-    }
-
-    /* ───────────────────────────────────────────────
-       ATMOSPHERIC OVERLAY — above all mountain layers
-       (z:4, below blend z:5)
-       Dark-blue wash that intentionally pushes the
-       mountains back and creates a moody, cinematic feel.
-    ─────────────────────────────────────────────── */
-    /* ── Mountain ridge travelling highlight ───────────────────────
-       Two-layer mask approach — the animation is physically trapped
-       inside the existing ridge glow and cannot appear anywhere else.
-
-       Layer 1: travelling gradient bead (22% wide, soft fade edges)
-       Layer 2: the mountain PNG itself (alpha channel as mask)
-
-       mask-composite: subtract = show layer1 ONLY where layer2 is
-       transparent. Since the PNG is transparent in the sky/glow area
-       above the ridge, the bead is visible only there. The mountain
-       body (opaque PNG pixels) suppresses layer1 to zero — impossible
-       for any rectangle, beam, or block to appear.
-
-       Seamless loop:
-         bead off-screen left  at −30% position → fully invisible ✓
-         bead off-screen right at 130% position → fully invisible ✓
-         loop jump = invisible (both ends fully off screen)
-    ──────────────────────────────────────────────────────────────────── */
-    .mountain-shimmer {
-      position: absolute;
-      left: 0;
       width: 100%;
-      display: block;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .mountain-shimmer-front {
-      bottom: 0;
-      height: auto;
-      min-height: 55vh;
-      filter:
-        drop-shadow(0px -1px 5px   rgba(200, 240, 255, 1.00))
-        drop-shadow(0px -6px 16px  rgba(87,  209, 228, 0.92))
-        drop-shadow(0px -18px 38px rgba(60,  160, 220, 0.55));
-      -webkit-mask:
-        linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%) no-repeat,
-        url('./assets/images/mountain-front.png') no-repeat;
-      mask:
-        linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%) no-repeat,
-        url('./assets/images/mountain-front.png') no-repeat;
-      -webkit-mask-size: 22% 100%, 100% auto;
-      mask-size:         22% 100%, 100% auto;
-      -webkit-mask-position: -30% 0%, 0% 100%;
-      mask-position:         -30% 0%, 0% 100%;
-      -webkit-mask-composite: source-out;
-      mask-composite:         subtract;
-      animation: shimmerFront 22s linear infinite;
-    }
-    .mountain-shimmer-back {
-      top: 0;
       height: 100%;
       object-fit: cover;
-      object-position: center bottom;
-      filter:
-        drop-shadow(0px -1px 4px   rgba(200, 240, 255, 0.90))
-        drop-shadow(0px -5px 12px  rgba(87,  209, 228, 0.78))
-        drop-shadow(0px -14px 30px rgba(60,  160, 220, 0.42));
-      -webkit-mask:
-        linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%) no-repeat,
-        url('./assets/images/mountain-back.png') no-repeat;
-      mask:
-        linear-gradient(90deg, transparent 0%, #000 22%, #000 78%, transparent 100%) no-repeat,
-        url('./assets/images/mountain-back.png') no-repeat;
-      -webkit-mask-size: 22% 100%, cover;
-      mask-size:         22% 100%, cover;
-      -webkit-mask-position: -30% 0%, center bottom;
-      mask-position:         -30% 0%, center bottom;
-      -webkit-mask-composite: source-out;
-      mask-composite:         subtract;
-      animation: shimmerBack 30s linear infinite;
-      animation-delay: -12s;
+      object-position: center center;
+      z-index: 0;
+      pointer-events: none;
     }
-    @keyframes shimmerFront {
-      from {
-        -webkit-mask-position: -30% 0%, 0% 100%;
-        mask-position:         -30% 0%, 0% 100%;
-      }
-      to {
-        -webkit-mask-position: 130% 0%, 0% 100%;
-        mask-position:         130% 0%, 0% 100%;
-      }
+
+    /* Subtle dark overlay — ensures text always readable */
+    .hero__video-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.25);
     }
-    @keyframes shimmerBack {
-      from {
-        -webkit-mask-position: -30% 0%, center bottom;
-        mask-position:         -30% 0%, center bottom;
-      }
-      to {
-        -webkit-mask-position: 130% 0%, center bottom;
-        mask-position:         130% 0%, center bottom;
-      }
-    }
+
 
     .hero__tagline {
       position: absolute;
@@ -573,20 +241,40 @@
         padding: 0 clamp(8px, 1.4vw, 16px);
       }
     }
+    /* Small tablet / large phone landscape — items can overflow on one row */
+    @media (min-width: 480px) and (max-width: 767px) {
+      .hero__proof {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 6px;
+        padding: 0 28px;
+        column-gap: 0;
+      }
+      .hero__proof-sep {
+        display: none;
+      }
+      .hero__proof-item {
+        font-size: clamp(8px, 1.6vw, 10px);
+        padding: 0 clamp(8px, 2vw, 14px);
+        letter-spacing: 0.12em;
+      }
+    }
     @media (max-width: 479px) {
       .hero__proof {
         top: calc(30% + 15vw);
         flex-wrap: wrap;
-        row-gap: 8px;
+        justify-content: center;
+        row-gap: 7px;
+        column-gap: 0;
         padding: 0 24px;
       }
       .hero__proof-item {
         font-size: 8px;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.11em;
         padding: 0 10px;
       }
       .hero__proof-sep {
-        height: 10px;
+        display: none;
       }
     }
 
@@ -597,7 +285,7 @@
     ─────────────────────────────────────────────────────────────────── */
     .hero__cta {
       position: absolute;
-      top: calc(36% + 10vw + 42px);
+      top: calc(36% + 10vw + 22px);
       left: 0;
       right: 0;
       z-index: 23;
@@ -660,14 +348,34 @@
 
     @media (max-width: 900px) {
       .hero__cta {
-        top: calc(34% + 12vw + 36px);
+        /* Tightened from 36px — brings CTA closer to proof strip on tablet */
+        top: calc(34% + 12vw + 20px);
         gap: clamp(12px, 2vw, 24px);
+      }
+    }
+    /* 480–767px: proof is 2 rows (~34px tall), ~4px gap below */
+    @media (min-width: 480px) and (max-width: 767px) {
+      .hero__cta {
+        top: calc(34% + 12vw + 38px);
       }
     }
     @media (max-width: 479px) {
       .hero__cta {
-        top: calc(30% + 15vw + 30px);
-        gap: clamp(10px, 3vw, 18px);
+        /* proof is 2 rows (~29px), ~4px gap */
+        top: calc(30% + 15vw + 33px);
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 0;
+      }
+      .hero__cta-link {
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        gap: 5px;
+        padding: 0 9px;
+      }
+      .hero__cta-link::after {
+        width: 9px;
+        height: 9px;
       }
       .hero__cta-sep { display: none; }
     }
@@ -729,57 +437,6 @@
       );
     }
 
-    /* Layer 12 · WORDMARK — bottom of hero, below the fade mask */
-
-    .hero__wordmark {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 22;
-      font-family: 'Glitz', sans-serif;
-      font-style: italic;
-      font-weight: normal;
-      font-size: max(56px, 13vw);
-      line-height: 0.88;
-      letter-spacing: 0;
-      white-space: nowrap;
-      text-align: center;
-      pointer-events: none;
-      user-select: none;
-      will-change: transform, opacity;
-      background: linear-gradient(
-        90deg,
-        rgba(87, 209, 228, 0.08)   0%,
-        rgba(87, 209, 228, 0.08)  12%,
-        rgba(108, 216, 244, 0.13) 20%,
-        rgba(138, 227, 252, 0.23) 30%,
-        rgba(163, 234, 255, 0.35) 40%,
-        rgba(180, 238, 255, 0.40) 50%,
-        rgba(163, 234, 255, 0.35) 60%,
-        rgba(138, 227, 252, 0.23) 70%,
-        rgba(108, 216, 244, 0.13) 80%,
-        rgba(87, 209, 228, 0.08)  88%,
-        rgba(87, 209, 228, 0.08) 100%
-      );
-      background-size: 400% 100%;
-      background-repeat: repeat;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: wordmarkIlluminate 24s linear infinite;
-    }
-
-    /* 400% background-size = tile is 4× element width.
-       Available space = 1W - 4W = -3W.
-       One tile in position% = 4W ÷ 3W = 133.3%.
-       117% → -17% = 134% ≈ one exact tile advance.
-       Both start and end: bright centre is 1.5W off-screen,
-       so no glow is visible at the loop boundary — seamless. */
-    @keyframes wordmarkIlluminate {
-      from { background-position: 117% 0; }
-      to   { background-position: -17% 0; }
-    }
 
     .hero__logo {
       position: fixed;
@@ -855,21 +512,6 @@
 
     /* Mobile landscape / small tablet — 480px to 767px */
     @media (max-width: 767px) {
-      /* Keep back mountain wide and cinematic — do not shrink it.
-         object-fit: cover handles framing without distortion. */
-      .hero__mountain-back {
-        left: -15%;
-        width: 130%;
-        height: 95vh;
-      }
-      /* Front mountain: positive bottom anchors it higher
-         in the composition — peak sits under the heading. */
-      .hero__mountain-front {
-        bottom: 6%;
-      }
-      .hero__sky img {
-        object-position: center center;
-      }
       .hero__scroll-indicator {
         bottom: 36px;
         right: 28px;
@@ -882,17 +524,6 @@
     @media (max-width: 479px) {
       /* FT logo hidden on mobile — too cramped alongside pill nav */
       .hero__logo { display: none; }
-      /* Back mountain: still wide, cropped naturally */
-      .hero__mountain-back {
-        left: -10%;
-        width: 120%;
-        height: 90vh;
-      }
-      /* Front mountain repositioned upward so more of the
-         mountain range is visible, not just the tip */
-      .hero__mountain-front {
-        bottom: 30%;
-      }
       /* Scroll indicator kept on mobile — hide/show via JS idle timer */
       .hero__scroll-indicator {
         bottom: 28px;
@@ -3859,42 +3490,17 @@
   <div class="hero-wrapper">
     <section class="hero" id="hero">
 
-      <!-- z:0 · Sky -->
-      <div class="hero__sky">
-        <img src="./assets/images/starry-night-final.jpg"
-             alt="" aria-hidden="true" fetchpriority="high" draggable="false" />
-      </div>
+      <!-- z:0 · Hero video background -->
+      <video class="hero__video"
+             autoplay muted loop playsinline
+             preload="auto"
+             aria-hidden="true"
+             oncanplay="this.playbackRate=0.8;">
+        <source src="./hero-tiger-working.mp4" type="video/mp4">
+      </video>
 
-      <!-- z:1 · Back mountain -->
-      <div class="hero__mountain-back">
-        <img src="./assets/images/mountain-back.png"
-             alt="" aria-hidden="true" draggable="false" />
-        <!-- Travelling ridge highlight: same image, stronger drop-shadow,
-             clip-path travels left→right to reveal the brighter glow
-             only where it passes. PNG alpha = automatic ridge masking. -->
-        <img class="mountain-shimmer mountain-shimmer-back"
-             src="./assets/images/mountain-back.png"
-             alt="" aria-hidden="true" draggable="false" />
-      </div>
-
-      <!-- z:2 · Backlight glow — between mountain layers -->
-      <div class="hero__glow" aria-hidden="true"></div>
-
-      <!-- z:3 · Front mountain -->
-      <div class="hero__mountain-front">
-        <img src="./assets/images/mountain-front.png"
-             alt="" aria-hidden="true" draggable="false" />
-        <!-- Travelling ridge highlight — same technique as back mountain. -->
-        <img class="mountain-shimmer mountain-shimmer-front"
-             src="./assets/images/mountain-front.png"
-             alt="" aria-hidden="true" draggable="false" />
-      </div>
-
-      <!-- z:3 · Front-mountain floor — seals the gap below the front mountain.
-                GSAP animates this with the exact same y as hero__mountain-front
-                so it travels in lockstep. Starts at the front mountain's
-                initial bottom edge, extends 120vh downward. -->
-      <div class="hero__front-floor" aria-hidden="true"></div>
+      <!-- z:1 · Subtle overlay for text readability -->
+      <div class="hero__video-overlay" aria-hidden="true"></div>
 
       <!-- z:23 · Tagline — central hero statement -->
       <p class="hero__tagline">Built for businesses<br>with higher standards.</p>
@@ -3918,9 +3524,6 @@
         <span class="hero__cta-sep" aria-hidden="true"></span>
         <a href="#pricing" class="hero__cta-link">Pricing</a>
       </div>
-
-      <!-- z:22 · Bottom wordmark — sits below the fade so it bleeds softly -->
-      <div class="hero__wordmark" aria-hidden="true">FIGHTING TIGERS</div>
 
       <!-- z:5 · Cinematic blend — soft dissolve into black,
                 sits above layers but below text so it never
@@ -3980,69 +3583,6 @@
   </section>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
-  <script>
-    gsap.registerPlugin(ScrollTrigger);
-
-    /*
-      TRAVEL IN ABSOLUTE VH — not yPercent
-      ─────────────────────────────────────────────────────────
-      Using y: '-Xvh' means travel is always exactly X viewport
-      heights, regardless of the image's natural height.
-      This makes the buffer maths predictable:
-
-        Buffer (bottom offset) must be > max travel
-        ─────────────────────────────────────────────
-        Sky           travel: -20vh   buffer: 25vh  ✓
-        Back mountain travel: -30vh   buffer: 40vh  ✓
-        Front mountain travel: -12vh   buffer: 20vh  ✓
-      ─────────────────────────────────────────────────────────
-      scrub: true = 1:1 scroll, zero lag.
-    */
-    const st = {
-      trigger: '.hero-wrapper',
-      start:   'top top',
-      end:     'bottom top',
-      scrub:   true,
-    };
-
-    /*
-      Parallax values scale down on smaller viewports so the
-      effect stays cinematic without feeling erratic on mobile.
-
-      Travel values per breakpoint:
-      ─────────────────────────────────────────────────────
-                   Desktop   Tablet   Mobile
-      Sky           -14vh    -10vh     -6vh
-      Back mountain -44vh    -28vh    -16vh
-      Front mountain -88vh   -52vh    -30vh
-      Text drift    +22vh    +16vh    +10vh
-    */
-    const mm = gsap.matchMedia();
-
-    mm.add('(min-width: 768px)', () => {
-      gsap.to('.hero__sky',                              { y: '-14vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__mountain-back',                    { y: '-44vh', ease: 'none', scrollTrigger: st });
-      gsap.to(['.hero__mountain-front', '.hero__front-floor'], { y: '-88vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__wordmark',                         { y: '-88vh', opacity: 0, ease: 'none', scrollTrigger: st });
-    });
-
-    mm.add('(min-width: 480px) and (max-width: 767px)', () => {
-      gsap.to('.hero__sky',                              { y: '-10vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__mountain-back',                    { y: '-28vh', ease: 'none', scrollTrigger: st });
-      gsap.to(['.hero__mountain-front', '.hero__front-floor'], { y: '-52vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__wordmark',                         { y: '-52vh', opacity: 0, ease: 'none', scrollTrigger: st });
-    });
-
-    mm.add('(max-width: 479px)', () => {
-      gsap.to('.hero__sky',                              { y:  '-6vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__mountain-back',                    { y: '-16vh', ease: 'none', scrollTrigger: st });
-      gsap.to(['.hero__mountain-front', '.hero__front-floor'], { y: '-30vh', ease: 'none', scrollTrigger: st });
-      gsap.to('.hero__wordmark',                         { y: '-30vh', opacity: 0, ease: 'none', scrollTrigger: st });
-    });
-
-  </script>
 
 
   <!-- ── CARD STACK ANIMATION ──────────────────────── -->
