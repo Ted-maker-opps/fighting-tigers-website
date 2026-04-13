@@ -162,13 +162,13 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.38);
     }
 
 
     .hero__tagline {
       position: absolute;
-      top: 36%;
+      top: 44%;
       left: 0;
       right: 0;
       z-index: 23;
@@ -188,13 +188,13 @@
     @media (max-width: 900px) {
       .hero__tagline {
         font-size: clamp(28px, 5.8vw, 58px);
-        top: 34%;
+        top: 42%;
       }
     }
     @media (max-width: 479px) {
       .hero__tagline {
         font-size: clamp(22px, 7.2vw, 36px);
-        top: 30%;
+        top: 38%;
         padding: 0 20px;
       }
     }
@@ -205,7 +205,7 @@
     ─────────────────────────────────────────────── */
     .hero__proof {
       position: absolute;
-      top: calc(36% + 10vw);
+      top: calc(44% + 10vw);
       left: 0;
       right: 0;
       z-index: 23;
@@ -234,7 +234,7 @@
     }
     @media (max-width: 900px) {
       .hero__proof {
-        top: calc(34% + 12vw);
+        top: calc(42% + 12vw);
       }
       .hero__proof-item {
         font-size: clamp(8px, 1.3vw, 11px);
@@ -261,7 +261,7 @@
     }
     @media (max-width: 479px) {
       .hero__proof {
-        top: calc(30% + 15vw);
+        top: calc(38% + 15vw);
         flex-wrap: wrap;
         justify-content: center;
         row-gap: 7px;
@@ -285,7 +285,7 @@
     ─────────────────────────────────────────────────────────────────── */
     .hero__cta {
       position: absolute;
-      top: calc(36% + 10vw + 22px);
+      top: calc(44% + 10vw + 22px);
       left: 0;
       right: 0;
       z-index: 23;
@@ -349,20 +349,20 @@
     @media (max-width: 900px) {
       .hero__cta {
         /* Tightened from 36px — brings CTA closer to proof strip on tablet */
-        top: calc(34% + 12vw + 20px);
+        top: calc(42% + 12vw + 20px);
         gap: clamp(12px, 2vw, 24px);
       }
     }
     /* 480–767px: proof is 2 rows (~34px tall), ~4px gap below */
     @media (min-width: 480px) and (max-width: 767px) {
       .hero__cta {
-        top: calc(34% + 12vw + 38px);
+        top: calc(42% + 12vw + 38px);
       }
     }
     @media (max-width: 479px) {
       .hero__cta {
         /* proof is 2 rows (~29px), ~4px gap */
-        top: calc(30% + 15vw + 33px);
+        top: calc(38% + 15vw + 33px);
         flex-wrap: wrap;
         justify-content: center;
         gap: 6px 0;
@@ -540,7 +540,6 @@
       position: relative;
       z-index: 10;
       background: var(--ft-bg);
-      margin-top: -6vh;
       padding: 32px 48px 56px;
     }
 
