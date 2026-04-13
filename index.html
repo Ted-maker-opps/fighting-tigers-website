@@ -2014,18 +2014,14 @@
        WHY US — sticky scroll storytelling
     ═══════════════════════════════════════════════ */
 
-    /* Wrapper: provides the scrollable height that drives the sticky */
+    /* Wrapper: auto height — no longer needs fake scroll travel */
     .whyus-wrap {
       position: relative;
-      height: 700vh;
+      height: auto;
     }
 
     .whyus {
-      position: sticky;
-      /* Sticks when the phone bottom first enters the viewport bottom.
-         Formula: 100vh - (55vh + 298px) = 45vh - 298px.
-         Clamped to 0 on short screens, max 200px on very tall screens. */
-      top: clamp(0px, calc(45vh - 298px), 200px);
+      position: relative;
       height: 100vh;
       width: 100%;
       overflow: hidden;
@@ -4868,7 +4864,7 @@
     })();
   </script>
 
-  <!-- ── Why Us — orbit + scroll jacking ─────────── -->
+  <!-- ── Why Us — orbit auto-rotation ────────────── -->
   <script>
     (function () {
       var wrap      = document.getElementById('whyusWrap');
@@ -4915,10 +4911,10 @@
 
       /* Brand colors per card (Forbes, Shape, Stanford, Adobe) */
       var CARD_COLORS = [
-        { r: 87,  g: 209, b: 228 }, /* Forbes — standard cyan */
-        { r: 250, g: 190, b: 20  }, /* Shape yellow   */
-        { r: 140, g: 21,  b: 21  }, /* Stanford cardinal */
-        { r: 232, g: 34,  b: 13  }  /* Adobe red      */
+        { r: 87,  g: 209, b: 228 },
+        { r: 250, g: 190, b: 20  },
+        { r: 140, g: 21,  b: 21  },
+        { r: 232, g: 34,  b: 13  }
       ];
       var DEFAULT_ORBIT = { r: 87, g: 209, b: 228 };
 
@@ -4934,15 +4930,12 @@
         var scale   = 0.68 + depth * 0.36;
         var opacity = 0.92 + depth * 0.08;
         var zIdx    = Math.round(depth * 8) + 1;
-
         panel.style.transform =
           'translate(calc(-50% + ' + x.toFixed(1) + 'px), calc(-50% + ' + y.toFixed(1) + 'px))' +
           ' scale(' + scale.toFixed(3) + ')';
         panel.style.opacity = opacity.toFixed(3);
         panel.style.zIndex  = zIdx;
       }
-
-      /* ── (orbit drawing handled by CSS-animated SVG) ── */
 
       /* ── Content swap ──────────────────────────── */
       function showContent(idx) {
@@ -4955,8 +4948,6 @@
           sub.textContent   = c.s;
           textInner.classList.remove('is-exiting');
         }, 200);
-
-        /* Update orbit color — contentIdx 1–4 maps to card 0–3 */
         var cardIdx = idx - 1;
         var col = (cardIdx >= 0 && cardIdx < CARD_COLORS.length)
           ? CARD_COLORS[cardIdx]
@@ -4966,44 +4957,16 @@
         stage.style.setProperty('--orbit-b', col.b);
       }
 
-      /* ── Sticky offset — matches CSS top: clamp(0, 45vh-298px, 200px) ─── */
-      function getStickyTop() {
-        return Math.max(0, Math.min(200, 0.45 * window.innerHeight - 298));
-      }
-
-      /* ── Orbit update from scroll progress ─────── */
-      function update() {
-        var stickyTop  = getStickyTop();
-        var rect       = wrap.getBoundingClientRect();
-        var scrollable = wrap.offsetHeight - window.innerHeight;
-        /* Progress starts at 0 when section first sticks (rect.top = stickyTop)
-           and reaches 1 when rect.top = stickyTop - scrollable. */
-        var progress   = Math.max(0, Math.min(1, (stickyTop - rect.top) / scrollable));
-        var step       = progress * 4;
-        var orbitOffset = -step * 90;
-        var activeIdx  = Math.min(3, Math.floor(step));
-        var contentIdx = step < 0.35 ? 0 : Math.min(4, activeIdx + 1);
-
-        panels.forEach(function (panel, i) {
-          placePanel(panel, BASE[i] + orbitOffset);
-          panel.classList.toggle('is-active', i === activeIdx);
-        });
-
-        showContent(contentIdx);
-      }
-
       /* ── Continuous clockwise ticker animation ─── */
-      var tickerAngle = 90; /* start at front-bottom */
+      var tickerAngle = 90;
       function animateTicker() {
-        tickerAngle = (tickerAngle + 0.40) % 360; /* ~24deg/s @ 60fps */
+        tickerAngle = (tickerAngle + 0.40) % 360;
         tickerEls.forEach(function (el, i) {
           if (!el) return;
           var ang  = (tickerAngle + TICKER_OFFSETS[i]) % 360;
           var r    = toRad(ang);
           var tx   = RX * Math.cos(r);
           var ty   = RY * Math.sin(r);
-          /* depth: front (bottom of orbit) = z:8, above phone (z:6)
-                    back  (top of orbit)    = z:3, behind phone */
           var zIdx = Math.sin(r) >= 0 ? 8 : 3;
           el.style.transform = 'translate(calc(-50% + ' + tx.toFixed(1) + 'px), calc(-50% + ' + ty.toFixed(1) + 'px))';
           el.style.zIndex    = zIdx;
@@ -5012,115 +4975,61 @@
       }
       animateTicker();
 
-      /* ── Scroll jacking ────────────────────────────
-         When the section is sticky-active (page scroll is within
-         the wrapper's scroll range), intercept wheel + touch events
-         and use window.scrollTo to drive progress smoothly.
+      /* ── Auto-rotation ─────────────────────────────────────────────────
+         Rotates one 90° step per cycle with ease-in-out, then dwells.
+         Timing:  ANIM_DUR ms smooth rotation  +  DWELL_DUR ms pause.
+         No scroll dependency — runs entirely on RAF + setTimeout.
+      ─────────────────────────────────────────────────────────────────── */
+      var ANIM_DUR  = 1100;   /* ms for each 90° rotation    */
+      var DWELL_DUR = 2800;   /* ms stationary on each panel */
 
-         Bounds are recalculated fresh on every event (no stale
-         cached position from page load).
-
-         Release mechanism: if the full delta would overshoot jackEnd
-         (or jackStart), we snap to the boundary WITHOUT calling
-         preventDefault so the browser's own momentum carries the user
-         into the next section cleanly. This prevents the section from
-         ever trapping the user during fast scrolling.
-      ──────────────────────────────────────────────── */
-
-      /* Returns fresh jacking bounds every call — avoids stale layout */
-      function getJackBounds() {
-        var stickyTop   = getStickyTop();
-        var scrollRange = wrap.offsetHeight - window.innerHeight;
-        var absTop      = wrap.getBoundingClientRect().top + window.scrollY;
-        return {
-          start: absTop - stickyTop,
-          end:   absTop + scrollRange - stickyTop
-        };
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       }
 
-      function onWheel(e) {
-        var b = getJackBounds();
-        if (window.scrollY < b.start || window.scrollY >= b.end) return;
-
-        /* Normalise delta across deltaMode values */
-        var raw = e.deltaY;
-        var px;
-        if      (e.deltaMode === 1) { px = raw * 28; }
-        else if (e.deltaMode === 2) { px = raw * window.innerHeight * 0.9; }
-        else                        { px = raw; }
-
-        var projected = window.scrollY + px;
-
-        /* Overshoot past end — snap to boundary and RELEASE so the
-           browser continues with its remaining momentum into the next
-           section. Never call preventDefault in this branch. */
-        if (px > 0 && projected >= b.end) {
-          window.scrollTo({ top: b.end, behavior: 'instant' });
-          update();
-          return;
-        }
-        /* Overshoot past start — same release logic going upward */
-        if (px < 0 && projected <= b.start) {
-          window.scrollTo({ top: b.start, behavior: 'instant' });
-          update();
-          return;
-        }
-
-        /* Within window — capture and pace the scroll */
-        e.preventDefault();
-        var capped = Math.max(-220, Math.min(220, px));
-        var newY   = Math.max(b.start, Math.min(b.end, window.scrollY + capped));
-        window.scrollTo({ top: newY, behavior: 'instant' });
-        update();
+      /* Apply a fractional step value to the orbit and content */
+      function applyStep(s) {
+        var orbitOffset = -s * 90;
+        var local       = ((s % 4) + 4) % 4;
+        var activeIdx   = Math.min(3, Math.floor(local));
+        var contentIdx  = local < 0.35 ? 0 : Math.min(4, activeIdx + 1);
+        panels.forEach(function (p, i) {
+          placePanel(p, BASE[i] + orbitOffset);
+          p.classList.toggle('is-active', i === activeIdx);
+        });
+        showContent(contentIdx);
       }
 
-      /* ── Touch jacking ─────────────────────────── */
-      var touchPrevY = 0;
-      function onTouchStart(e) { touchPrevY = e.touches[0].clientY; }
-      function onTouchMove(e) {
-        var b = getJackBounds();
-        if (window.scrollY < b.start || window.scrollY >= b.end) return;
+      var stepCount = 0;
 
-        var dy        = touchPrevY - e.touches[0].clientY;
-        touchPrevY    = e.touches[0].clientY;
-        var projected = window.scrollY + dy * 1.4;
+      function runNextStep() {
+        var fromStep = stepCount;
+        var toStep   = stepCount + 1;
+        var startTs  = null;
 
-        /* Same release logic for touch */
-        if (dy > 0 && projected >= b.end) {
-          window.scrollTo({ top: b.end, behavior: 'instant' });
-          update();
-          return;
+        function animFrame(ts) {
+          if (!startTs) startTs = ts;
+          var t     = Math.min(1, (ts - startTs) / ANIM_DUR);
+          var eased = easeInOutCubic(t);
+          applyStep(fromStep + eased);
+          if (t < 1) {
+            requestAnimationFrame(animFrame);
+          } else {
+            stepCount = toStep;
+            applyStep(stepCount);
+            setTimeout(runNextStep, DWELL_DUR);
+          }
         }
-        if (dy < 0 && projected <= b.start) {
-          window.scrollTo({ top: b.start, behavior: 'instant' });
-          update();
-          return;
-        }
-
-        e.preventDefault();
-        var newY = Math.max(b.start, Math.min(b.end, projected));
-        window.scrollTo({ top: newY, behavior: 'instant' });
-        update();
+        requestAnimationFrame(animFrame);
       }
-
-      /* ── Passive scroll fallback ───────────────── */
-      var ticking = false;
-      function onScroll() {
-        if (!ticking) {
-          requestAnimationFrame(function () { update(); ticking = false; });
-          ticking = true;
-        }
-      }
-
-      window.addEventListener('wheel',       onWheel,       { passive: false });
-      window.addEventListener('touchstart',  onTouchStart,  { passive: true  });
-      window.addEventListener('touchmove',   onTouchMove,   { passive: false });
-      window.addEventListener('scroll',      onScroll,      { passive: true  });
-      window.addEventListener('resize',      function () { setRadii(); update(); }, { passive: true });
 
       /* Init */
       setRadii();
-      update();
+      applyStep(0);
+      showContent(0);
+      setTimeout(runNextStep, DWELL_DUR);
+
+      window.addEventListener('resize', function () { setRadii(); }, { passive: true });
     })();
   </script>
 
