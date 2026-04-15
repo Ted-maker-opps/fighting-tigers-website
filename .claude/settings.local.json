@@ -18,7 +18,10 @@
       "Bash(python3:*)",
       "Bash(ls -la /Users/tim/Desktop/websites/fighting-tigers-website/*.svg /Users/tim/Desktop/websites/fighting-tigers-website/*.ico /Users/tim/Desktop/websites/fighting-tigers-website/*.png /Users/tim/Desktop/websites/fighting-tigers-website/*.webmanifest)",
       "Bash(ls /Users/tim/Desktop/websites/fighting-tigers-website/*.html)",
-      "Bash(grep -r \"hero\\\\.html\" /Users/tim/Desktop/websites/fighting-tigers-website/*.html *.xml *.txt)"
+      "Bash(grep -r \"hero\\\\.html\" /Users/tim/Desktop/websites/fighting-tigers-website/*.html *.xml *.txt)",
+      "Bash(identify favicon-96x96.png apple-touch-icon.png web-app-manifest-192x192.png web-app-manifest-512x512.png)",
+      "Bash(grep -r \"icon\\\\|favicon\\\\|apple-touch\" --include=*.html -l)",
+      "Bash(ls -la *.ico *.svg)"
     ]
   }
 }
