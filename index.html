@@ -143,26 +143,113 @@
     }
 
     /* ───────────────────────────────────────────────
-       HERO VIDEO BACKGROUND
+       HERO NEON BACKGROUND
+       Pure-black SVG canvas. Curved light trails sweep
+       in across the hero, dim to atmospheric background,
+       then a large central "ft" mark draws in formed of
+       neon light. Continuous gentle pulse keeps the
+       scene alive. Cursor parallax shifts the ambient
+       layer faster than the ft (depth illusion).
     ─────────────────────────────────────────────── */
-    .hero__video {
+    .hero__neon {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: center center;
+      display: block;
       z-index: 0;
       pointer-events: none;
+      background: #000;
+      -webkit-mask-image: linear-gradient(to bottom,
+        #000 0%, #000 58%, rgba(0,0,0,0.55) 82%, transparent 100%);
+              mask-image: linear-gradient(to bottom,
+        #000 0%, #000 58%, rgba(0,0,0,0.55) 82%, transparent 100%);
     }
 
-    /* Subtle dark overlay — ensures text always readable */
+    /* Ambient sweeping light trails — slow elegant entry; settle
+       to atmospheric background; then very slow gentle pulse.
+       Per-stroke CSS variables drive timing + intensity so no
+       two trails ever sync (cinematic, never mechanical):
+         --d         : entry delay
+         --draw-peak : opacity at draw peak
+         --life-low  : settled opacity (pulse low)
+         --life-high : pulse high
+         --life-dur  : pulse period (8s–22s typical) */
+    .hero__neon .neon-streak {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+      animation:
+        streak-draw 2.6s cubic-bezier(0.32, 0, 0.18, 1) var(--d, 0s) both,
+        streak-life var(--life-dur, 12s) ease-in-out calc(2.6s + var(--d, 0s)) infinite both;
+    }
+    @keyframes streak-draw {
+      0%   { stroke-dashoffset: 1; opacity: 0; }
+      25%  {                       opacity: var(--draw-peak, 0.55); }
+      62%  { stroke-dashoffset: 0; opacity: var(--draw-peak, 0.55); }
+      100% { stroke-dashoffset: 0; opacity: var(--life-low, 0.14); }
+    }
+    @keyframes streak-life {
+      0%, 100% { opacity: var(--life-low, 0.14); }
+      50%      { opacity: var(--life-high, 0.28); }
+    }
+
+    /* "ft" mark — actual Glitz wordmark, oversized.
+       The body itself is fully opaque from the start; the build-in
+       reveal is handled entirely by the SVG mask (small rectangular
+       segments fading from black to transparent in a bottom-up wave).
+       Once the mask has fully cleared, the gentle ft-life pulse
+       takes over for the settled state. */
+    .hero__neon .ft-mark {
+      opacity: 1;
+      animation: ft-life 8s ease-in-out 4.2s infinite both;
+    }
+    @keyframes ft-life {
+      0%, 100% { opacity: 1.00; }
+      50%      { opacity: 0.78; }
+    }
+
+    /* Build-in mask segments — each rect starts fully opaque (black,
+       hiding the text underneath) and fades to transparent on a
+       staggered delay calculated bottom-up by JS. Slightly longer
+       fade duration overlaps adjacent rows for soft transitions
+       so the bloom halo isn't sliced cleanly. */
+    .hero__neon .ft-segment {
+      fill: #000;
+      fill-opacity: 1;
+      animation: seg-reveal 0.65s cubic-bezier(0.4, 0, 0.2, 1) var(--d, 0s) forwards;
+    }
+    @keyframes seg-reveal {
+      0%   { fill-opacity: 1; }
+      100% { fill-opacity: 0; }
+    }
+
+    /* Reduced-motion: snap straight to a calm final state. */
+    @media (prefers-reduced-motion: reduce) {
+      .hero__neon .neon-streak,
+      .hero__neon .ft-mark {
+        animation: none;
+        stroke-dashoffset: 0;
+        opacity: 1;
+        filter: none;
+        transform: none;
+      }
+      .hero__neon .ft-segment { animation: none; fill-opacity: 0; }
+    }
+
+    /* Readability overlay — radial dark cap centered on the hero
+       copy so the painting stays rich at the edges but text always
+       sits on a cleaner field. */
     .hero__video-overlay {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: rgba(0, 0, 0, 0.55);
+      background:
+        radial-gradient(ellipse 82% 58% at 50% 48%,
+          rgba(0,0,0,0.72) 0%,
+          rgba(0,0,0,0.38) 48%,
+          rgba(0,0,0,0.00) 100%);
     }
 
 
@@ -3485,14 +3572,206 @@
   <div class="hero-wrapper">
     <section class="hero" id="hero">
 
-      <!-- z:0 · Hero video background -->
-      <video class="hero__video"
-             autoplay muted loop playsinline
-             preload="auto"
-             aria-hidden="true"
-             oncanplay="this.playbackRate=0.8;">
-        <source src="./hero-tiger-working.mp4" type="video/mp4">
-      </video>
+      <!-- z:0 · Hero light-trail background (SVG, cinematic) -->
+      <svg class="hero__neon" id="heroNeon"
+           viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"
+           aria-hidden="true">
+        <defs>
+          <!-- Three depth filters for the light trails.
+               trailNear → bright foreground (crisper)
+               trailMid  → medium soft glow
+               trailFar  → very wide diffuse atmosphere -->
+          <filter id="trailNear" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2"  result="b1"/>
+            <feGaussianBlur stdDeviation="6"  result="b2"/>
+            <feGaussianBlur stdDeviation="16" result="b3"/>
+            <feMerge>
+              <feMergeNode in="b3"/>
+              <feMergeNode in="b2"/>
+              <feMergeNode in="b1"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="trailMid" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3.5" result="b1"/>
+            <feGaussianBlur stdDeviation="10"  result="b2"/>
+            <feGaussianBlur stdDeviation="24"  result="b3"/>
+            <feGaussianBlur stdDeviation="48"  result="b4"/>
+            <feMerge>
+              <feMergeNode in="b4"/>
+              <feMergeNode in="b3"/>
+              <feMergeNode in="b2"/>
+              <feMergeNode in="b1"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="trailFar" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="5"  result="b1"/>
+            <feGaussianBlur stdDeviation="14" result="b2"/>
+            <feGaussianBlur stdDeviation="32" result="b3"/>
+            <feGaussianBlur stdDeviation="56" result="b4"/>
+            <feMerge>
+              <feMergeNode in="b4"/>
+              <feMergeNode in="b3"/>
+              <feMergeNode in="b2"/>
+              <feMergeNode in="b1"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <!-- Backwards-compat alias (the ft outline used to reference this) -->
+          <filter id="neonAtmos" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3.5" result="b1"/>
+            <feGaussianBlur stdDeviation="10"  result="b2"/>
+            <feGaussianBlur stdDeviation="24"  result="b3"/>
+            <feMerge>
+              <feMergeNode in="b3"/>
+              <feMergeNode in="b2"/>
+              <feMergeNode in="b1"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <!-- "ft" mark filter — OUTER GLOW ONLY, no near-source blur.
+               Two wide Gaussian halos sit BEHIND the SourceGraphic
+               and are dimmed via feComponentTransfer so they read
+               as soft surrounding aura. The SourceGraphic merges
+               last and is unblurred — letterform edges stay razor
+               sharp. The glow lives outside the silhouette. -->
+          <filter id="neonSoft" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="halo"/>
+            <feComponentTransfer in="halo" result="haloDim">
+              <feFuncA type="linear" slope="0.55"/>
+            </feComponentTransfer>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="40" result="atmos"/>
+            <feComponentTransfer in="atmos" result="atmosDim">
+              <feFuncA type="linear" slope="0.32"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode in="atmosDim"/>
+              <feMergeNode in="haloDim"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <!-- Build-in mask. White background = visible by default;
+               black segments (added by JS at startup) hide regions
+               and animate their fill-opacity to reveal the text
+               in a bottom-up modular wave. -->
+          <mask id="ftBuildMask" x="0" y="0" width="1600" height="900" maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="1600" height="900" fill="#fff"/>
+            <g id="ftBuildSegments"></g>
+          </mask>
+
+          <!-- FT logo gradient — premium tonal cool-blue.
+               Top edges: pale icy cyan-blue (highlight).
+               Mid: soft muted cyan-steel.
+               Bottom: deeper navy-steel (depth).
+               Read as light catching the upper edges of the letterforms. -->
+          <linearGradient id="ftGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="#dcf2fc"/>
+            <stop offset="32%"  stop-color="#a8d8ec"/>
+            <stop offset="62%"  stop-color="#6c9cc0"/>
+            <stop offset="100%" stop-color="#3a6088"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Ambient light trails — 13 trails across 3 depth layers.
+             JS RAF translates this group for parallax. Cool monochromatic
+             palette with one rare warm pearl accent. Each trail carries
+             per-stroke CSS variables so opacities and pulse periods all
+             differ — nothing ever syncs. -->
+        <g id="neonAmbient" fill="none" stroke-linecap="round">
+
+          <!-- ── BACKGROUND LAYER · trailFar · very subtle, deep navy ── -->
+          <g id="trailsFar" filter="url(#trailFar)">
+            <!-- Distant top arc — deep navy, near-invisible -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.05s; --draw-peak:0.28; --life-low:0.06; --life-high:0.13; --life-dur:20s"
+                  stroke="#2a4868" stroke-width="1.1"
+                  d="M -200 30 C 300 100 800 180 1300 220 C 1600 240 1850 250 2000 250"/>
+            <!-- Upper-mid distant trail — muted blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.55s; --draw-peak:0.30; --life-low:0.06; --life-high:0.14; --life-dur:17s"
+                  stroke="#3a5878" stroke-width="0.9"
+                  d="M -150 320 C 200 380 600 420 1000 430 C 1400 440 1700 430 2000 410"/>
+            <!-- Mid-right faint sweep — steel blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.75s; --draw-peak:0.34; --life-low:0.07; --life-high:0.16; --life-dur:19s"
+                  stroke="#4a6890" stroke-width="1.0"
+                  d="M 2050 540 C 1700 580 1300 620 950 600 C 600 580 250 540 -100 520"/>
+            <!-- Soft low background — very deep navy -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.30s; --draw-peak:0.30; --life-low:0.06; --life-high:0.13; --life-dur:22s"
+                  stroke="#243f5e" stroke-width="1.2"
+                  d="M 2000 700 C 1500 670 1000 660 600 680 C 200 700 -100 720 -250 740"/>
+            <!-- Lower-far drift — mid steel-blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.90s; --draw-peak:0.28; --life-low:0.05; --life-high:0.12; --life-dur:21s"
+                  stroke="#3a6090" stroke-width="0.9"
+                  d="M -250 880 C 200 850 700 830 1100 840 C 1500 850 1800 870 2050 880"/>
+          </g>
+
+          <!-- ── MID LAYER · trailMid · medium soft glow ── -->
+          <g id="trailsMid" filter="url(#trailMid)">
+            <!-- Descending ice-blue, upper-mid -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.12s; --draw-peak:0.50; --life-low:0.12; --life-high:0.24; --life-dur:11s"
+                  stroke="#88c2da" stroke-width="1.6"
+                  d="M 1900 240 C 1450 320 950 400 500 450 C 200 480 -100 490 -200 495"/>
+            <!-- Long horizontal mid sweep, muted steel-cyan -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.40s; --draw-peak:0.48; --life-low:0.10; --life-high:0.22; --life-dur:16s"
+                  stroke="#7eb4cc" stroke-width="1.4"
+                  d="M -100 380 C 250 410 600 400 950 390 C 1300 380 1600 380 1900 390"/>
+            <!-- Lower-mid gentle ascending arc — pale steel-blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.62s; --draw-peak:0.55; --life-low:0.14; --life-high:0.26; --life-dur:12s"
+                  stroke="#a0c8e0" stroke-width="1.8"
+                  d="M -100 760 C 350 690 800 640 1100 660 C 1400 680 1700 710 1900 730"/>
+            <!-- Diagonal upper-left → lower-right — soft mid blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.22s; --draw-peak:0.45; --life-low:0.09; --life-high:0.20; --life-dur:10s"
+                  stroke="#90b8d4" stroke-width="1.3"
+                  d="M -150 200 C 200 280 600 360 1000 440 C 1300 500 1600 560 1900 620"/>
+            <!-- Bright electric cyan accent — replaces the warm pearl, slow pulse -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.48s; --draw-peak:0.58; --life-low:0.10; --life-high:0.24; --life-dur:18s"
+                  stroke="#5fcde6" stroke-width="1.5"
+                  d="M 1900 100 C 1450 180 1050 280 700 380"/>
+          </g>
+
+          <!-- ── FOREGROUND LAYER · trailNear · brighter, crisper ── -->
+          <g id="trailsNear" filter="url(#trailNear)">
+            <!-- Long graceful arc, top — pale icy cyan -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.00s; --draw-peak:0.78; --life-low:0.26; --life-high:0.48; --life-dur:13s"
+                  stroke="#cae8f8" stroke-width="3.2"
+                  d="M -150 60 C 350 220 850 320 1300 350 C 1550 365 1700 360 1850 350"/>
+            <!-- Thick mid horizontal sweep — cool cyan-blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.32s; --draw-peak:0.72; --life-low:0.22; --life-high:0.42; --life-dur:11s"
+                  stroke="#9ad0e8" stroke-width="2.8"
+                  d="M -200 480 C 350 520 850 530 1250 510 C 1500 495 1800 470 2000 460"/>
+            <!-- Thick sweep, lower — muted steel-blue -->
+            <path class="neon-streak" pathLength="1"
+                  style="--d:0.80s; --draw-peak:0.66; --life-low:0.20; --life-high:0.36; --life-dur:14s"
+                  stroke="#7caac6" stroke-width="3.0"
+                  d="M -100 850 C 350 800 750 770 1100 780 C 1450 790 1750 820 1900 850"/>
+          </g>
+        </g>
+
+        <!-- The central "ft" mark — actual brand wordmark in Glitz.
+             Layered: soft luminous body + thin outlined edge highlight.
+             Same letterforms as the navbar logo, oversized. -->
+        <g id="neonFt" mask="url(#ftBuildMask)">
+          <text class="ft-mark"
+                x="800" y="490"
+                font-family="Glitz, sans-serif"
+                font-size="560"
+                fill="url(#ftGradient)"
+                text-anchor="middle"
+                dominant-baseline="middle"
+                filter="url(#neonSoft)">ft</text>
+        </g>
+      </svg>
 
       <!-- z:1 · Subtle overlay for text readability -->
       <div class="hero__video-overlay" aria-hidden="true"></div>
@@ -5358,6 +5637,177 @@
       }
     })();
   </script>
+
+  <!-- ═══════════════════════════════════════════════
+       HERO — Neon light-trail parallax loop
+
+       Two SVG groups (ambient streaks + central "ft")
+       are translated each frame at different rates,
+       creating depth. CSS keyframes handle the entry
+       sweep and continuous pulse.
+  ═══════════════════════════════════════════════ -->
+  <script>
+    (function () {
+      var svg     = document.getElementById('heroNeon');
+      var hero    = document.getElementById('hero');
+      if (!svg || !hero) return;
+      var ambient = document.getElementById('neonAmbient');
+      var ft      = document.getElementById('neonFt');
+      var segGroup= document.getElementById('ftBuildSegments');
+      var trailsFar  = document.getElementById('trailsFar');
+      var trailsMid  = document.getElementById('trailsMid');
+      var trailsNear = document.getElementById('trailsNear');
+      if (!ambient || !ft) return;
+
+      /* ── Build the "ft" mask: a grid of small black rects covering
+            the text + glow region. Each rect fades from opaque to
+            transparent on a delay, computed bottom-to-top with a
+            small horizontal stagger inside each row.  Together they
+            assemble the wordmark like a modular construction.
+
+            Once the wave finishes, the mask attribute and segments
+            are stripped from the DOM entirely so the final state
+            renders the text + bloom without any mask rasterization
+            — perfectly clean glow, no construction artefacts. */
+
+      /* Timing constants — also drive the cleanup timeout */
+      var BUILD_BASE_DELAY = 2.0;   /* wait for streaks to enter first */
+      var BUILD_ROW_TOTAL  = 1.65;  /* vertical wave bottom→top */
+      var BUILD_COL_TOTAL  = 0.32;  /* horizontal stagger per row */
+      var BUILD_SEG_DUR    = 0.65;  /* matches CSS seg-reveal duration */
+      var BUILD_END_MS     = (BUILD_BASE_DELAY + BUILD_ROW_TOTAL +
+                              BUILD_COL_TOTAL + BUILD_SEG_DUR) * 1000;
+
+      (function buildFtMaskSegments() {
+        if (!segGroup) return;
+        var SVG = 'http://www.w3.org/2000/svg';
+
+        /* Cover region: text + parallax + glow padding */
+        var x0 = 420, y0 = 130;
+        var w  = 760, h  = 720;
+        var rows = 22;
+        var cols = 12;
+        var stepW = w / cols;
+        var stepH = h / rows;
+        var rowGap = BUILD_ROW_TOTAL / (rows - 1);
+        var colGap = BUILD_COL_TOTAL / (cols - 1);
+
+        var frag = document.createDocumentFragment();
+        for (var r = 0; r < rows; r++) {
+          for (var c = 0; c < cols; c++) {
+            var rect = document.createElementNS(SVG, 'rect');
+            rect.setAttribute('class', 'ft-segment');
+            /* +0.6 overlap: prevents pixel gaps between adjacent rects */
+            rect.setAttribute('x', (x0 + c * stepW).toFixed(2));
+            rect.setAttribute('y', (y0 + r * stepH).toFixed(2));
+            rect.setAttribute('width',  (stepW + 0.6).toFixed(2));
+            rect.setAttribute('height', (stepH + 0.6).toFixed(2));
+            /* Bottom row (r = rows-1) fades first → smallest delay */
+            var rDelay = (rows - 1 - r) * rowGap;
+            var cDelay = c * colGap;
+            rect.style.setProperty('--d', (BUILD_BASE_DELAY + rDelay + cDelay).toFixed(3) + 's');
+            frag.appendChild(rect);
+          }
+        }
+        segGroup.appendChild(frag);
+      })();
+
+      /* Once the construction wave has fully completed, strip the mask
+         and remove the segments from the DOM. The final settled state
+         renders as a clean masked-text-free element so the bloom halo
+         and edges are perfectly smooth — no scaffolding remains. */
+      setTimeout(function () {
+        ft.removeAttribute('mask');
+        if (segGroup && segGroup.parentNode) {
+          segGroup.parentNode.removeChild(segGroup);
+        }
+      }, BUILD_END_MS + 80);
+
+      var prefersReduced = window.matchMedia &&
+                           window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      var targetMx = 0, targetMy = 0;
+      var curMx    = 0, curMy    = 0;
+      var running  = true;
+
+      window.addEventListener('mousemove', function (e) {
+        var r = hero.getBoundingClientRect();
+        if (e.clientY < r.top || e.clientY > r.bottom) return;
+        targetMx = ((e.clientX - r.left) / r.width  - 0.5) * 22;
+        targetMy = ((e.clientY - r.top)  / r.height - 0.5) * 14;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', function (e) {
+        if (!e.touches || !e.touches.length) return;
+        var t = e.touches[0];
+        var r = hero.getBoundingClientRect();
+        targetMx = ((t.clientX - r.left) / r.width  - 0.5) * 14;
+        targetMy = ((t.clientY - r.top)  / r.height - 0.5) * 10;
+      }, { passive: true });
+
+      document.addEventListener('visibilitychange', function () {
+        running = !document.hidden;
+        if (running) requestAnimationFrame(frame);
+      });
+
+      /* Each layer drifts on its own mixed-period sin/cos formula,
+         and each carries a different cursor-parallax multiplier so
+         the foreground tracks the cursor more than the deep layer.
+         Two sin/cos terms per axis at incompatible periods give
+         non-repeating "current"-like motion — never feels looped. */
+      function frame(now) {
+        if (!running) return;
+        /* Heavy cursor smoothing — feels expensive, never twitchy */
+        curMx += (targetMx - curMx) * 0.030;
+        curMy += (targetMy - curMy) * 0.030;
+
+        /* ── Background layer · slowest drift, smallest cursor response ── */
+        if (trailsFar) {
+          var fX = Math.sin(now * 0.0000620) * 38 + Math.cos(now * 0.0000931) * 16;
+          var fY = Math.cos(now * 0.0000533) * 22 + Math.sin(now * 0.0000713) * 9;
+          var fR = Math.sin(now * 0.0000460) * 0.32;   /* ±0.32deg over ~135s */
+          trailsFar.setAttribute('transform',
+            'translate(' + (curMx * 0.45 + fX).toFixed(2) + ' ' +
+                           (curMy * 0.45 + fY).toFixed(2) + ') ' +
+            'rotate(' + fR.toFixed(3) + ' 800 450)');
+        }
+
+        /* ── Mid layer · medium drift + medium cursor response ── */
+        if (trailsMid) {
+          var mX = Math.sin(now * 0.0001100) * 26 + Math.cos(now * 0.0001417) * 12;
+          var mY = Math.cos(now * 0.0001000) * 16 + Math.sin(now * 0.0001280) * 7;
+          var mR = Math.cos(now * 0.0000920) * 0.42;
+          trailsMid.setAttribute('transform',
+            'translate(' + (curMx * 1.00 + mX).toFixed(2) + ' ' +
+                           (curMy * 1.00 + mY).toFixed(2) + ') ' +
+            'rotate(' + mR.toFixed(3) + ' 800 450)');
+        }
+
+        /* ── Foreground layer · faster drift + strongest cursor response ── */
+        if (trailsNear) {
+          var nX = Math.sin(now * 0.0001780) * 18 + Math.cos(now * 0.0002090) * 8;
+          var nY = Math.cos(now * 0.0001630) * 11 + Math.sin(now * 0.0001900) * 5;
+          var nR = Math.sin(now * 0.0001740) * 0.28;
+          trailsNear.setAttribute('transform',
+            'translate(' + (curMx * 1.65 + nX).toFixed(2) + ' ' +
+                           (curMy * 1.65 + nY).toFixed(2) + ') ' +
+            'rotate(' + nR.toFixed(3) + ' 800 450)');
+        }
+
+        /* ── "ft" mark · anchored focal point — barely moves ── */
+        var tx = curMx * 0.38 + Math.sin(now * 0.00009) * 2;
+        var ty = curMy * 0.38 + Math.cos(now * 0.00011) * 2.5;
+        ft.setAttribute('transform',
+          'translate(' + tx.toFixed(2) + ' ' + ty.toFixed(2) + ')');
+
+        requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    })();
+  </script>
+
 
 </body>
 </html>

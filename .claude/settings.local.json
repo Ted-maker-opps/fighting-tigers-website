@@ -21,7 +21,13 @@
       "Bash(grep -r \"hero\\\\.html\" /Users/tim/Desktop/websites/fighting-tigers-website/*.html *.xml *.txt)",
       "Bash(identify favicon-96x96.png apple-touch-icon.png web-app-manifest-192x192.png web-app-manifest-512x512.png)",
       "Bash(grep -r \"icon\\\\|favicon\\\\|apple-touch\" --include=*.html -l)",
-      "Bash(ls -la *.ico *.svg)"
+      "Bash(ls -la *.ico *.svg)",
+      "Bash(awk 'NR>=5504 && NR<=5520 {print NR\": \"$0}' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)",
+      "Bash(awk '/HERO — Canvas 2D brush/,/^  <\\\\/script>/{ print NR\": \"$0 }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)",
+      "Bash(node -e ' *)",
+      "Bash(/usr/bin/python3 -)",
+      "Bash(awk 'NR==5385,/<\\\\/script>/{ print NR\": \"$0; if\\(/<\\\\/script>/\\) exit }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)",
+      "Bash(awk 'NR==5417,/^  <\\\\/script>/{ print NR\": \"$0; if\\(/^  <\\\\/script>/\\) exit }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)"
     ]
   }
 }
