@@ -27,7 +27,20 @@
       "Bash(node -e ' *)",
       "Bash(/usr/bin/python3 -)",
       "Bash(awk 'NR==5385,/<\\\\/script>/{ print NR\": \"$0; if\\(/<\\\\/script>/\\) exit }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)",
-      "Bash(awk 'NR==5417,/^  <\\\\/script>/{ print NR\": \"$0; if\\(/^  <\\\\/script>/\\) exit }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)"
+      "Bash(awk 'NR==5417,/^  <\\\\/script>/{ print NR\": \"$0; if\\(/^  <\\\\/script>/\\) exit }' /Users/tim/Desktop/websites/fighting-tigers-website/index.html)",
+      "Bash(grep -nB3 \"const canvas = section\" index.html)",
+      "Bash(grep -nB10 \"const W = canvas.width, H = canvas.height\" index.html)",
+      "Bash(awk '/<svg class=\"hero__neon\"/,/<\\\\/svg>/{print NR}' index.html)",
+      "Bash(awk '/HERO — Neon light-trail parallax loop/,/^  <\\\\/script>/{print NR}' index.html)",
+      "Bash(awk 'NR==5472,/^  <\\\\/script>/{print NR\": \"$0; if\\(/^  <\\\\/script>/\\) exit}' index.html)",
+      "Bash(awk '/^    \\\\.whyus-wrap \\\\{/,0{print NR; if\\(/^    @keyframes orbit-sweep/\\) prev=NR}' index.html)",
+      "Bash(awk 'NR==2111,/^  <\\\\/style>/{print NR\": \"$0}' index.html)",
+      "Bash(grep -v \"^[0-9]*:    \\\\.\\\\|^[0-9]*:      <\\\\|whyus__\\\\| -->\\\\| {$\")",
+      "Bash(awk 'NR>=4955 && NR<=5135 { print NR\": \"$0 }' index.html)",
+      "Bash(sed -n '1006,1013p' index.html)",
+      "Bash(sed -n '2185,2193p' index.html)",
+      "Bash(sed -n '1014,1020p' index.html)",
+      "Bash(sed -n '2194,2202p' index.html)"
     ]
   }
 }
