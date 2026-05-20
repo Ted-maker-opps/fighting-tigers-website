@@ -101,7 +101,10 @@
     :root {
       --ft-cyan: #57d1e4;
       --ft-bg:   #000;
-      --section-heading-size: clamp(24px, 6vw, 104px);
+      /* Matches the "Let's Talk" contact heading scale so every major
+         section heading stays large + premium on mobile (48px floor)
+         while scaling cleanly up to desktop. */
+      --section-heading-size: clamp(48px, 6vw, 90px);
     }
 
     html, body {
@@ -268,7 +271,8 @@
       text-align: center;
       font-family: 'Glitz', sans-serif;
       font-style: normal;
-      font-size: clamp(34px, 5vw, 80px);
+      /* Matches the contact "Let's Talk" scale — large + premium */
+      font-size: clamp(48px, 6vw, 88px);
       font-weight: 400;
       line-height: 0.94;
       letter-spacing: 0.01em;
@@ -280,13 +284,14 @@
     }
     @media (max-width: 900px) {
       .hero__tagline {
-        font-size: clamp(28px, 5.8vw, 58px);
+        font-size: clamp(38px, 6vw, 64px);
         top: 42%;
       }
     }
     @media (max-width: 479px) {
       .hero__tagline {
-        font-size: clamp(22px, 7.2vw, 36px);
+        /* Tuned so the two-line statement still fits cleanly on phones */
+        font-size: clamp(28px, 7.6vw, 40px);
         top: 38%;
         padding: 0 20px;
       }
@@ -298,7 +303,7 @@
     ─────────────────────────────────────────────── */
     .hero__proof {
       position: absolute;
-      top: calc(44% + 10vw);
+      top: calc(44% + 10vw + 14px);
       left: 0;
       right: 0;
       z-index: 23;
@@ -327,47 +332,49 @@
     }
     @media (max-width: 900px) {
       .hero__proof {
-        top: calc(42% + 12vw);
+        top: calc(42% + 12vw + 14px);
       }
       .hero__proof-item {
         font-size: clamp(8px, 1.3vw, 11px);
         padding: 0 clamp(8px, 1.4vw, 16px);
       }
     }
-    /* Small tablet / large phone landscape — items can overflow on one row */
+    /* Small tablet / large phone — keep all four items on ONE line
+       with separators visible; responsive sizing keeps it balanced. */
     @media (min-width: 480px) and (max-width: 767px) {
       .hero__proof {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: center;
-        row-gap: 6px;
-        padding: 0 28px;
         column-gap: 0;
+        padding: 0 20px;
       }
       .hero__proof-sep {
-        display: none;
+        display: block;
       }
       .hero__proof-item {
-        font-size: clamp(8px, 1.6vw, 10px);
-        padding: 0 clamp(8px, 2vw, 14px);
-        letter-spacing: 0.12em;
+        font-size: clamp(8px, 1.8vw, 11px);
+        padding: 0 clamp(8px, 1.6vw, 14px);
+        letter-spacing: 0.1em;
       }
     }
+    /* Phones — single line, no wrap, separators kept; font/letter-spacing
+       and padding tightened just enough so the full row fits to ~320px. */
     @media (max-width: 479px) {
       .hero__proof {
-        top: calc(38% + 15vw);
-        flex-wrap: wrap;
+        top: calc(38% + 15vw + 14px);
+        flex-wrap: nowrap;
         justify-content: center;
-        row-gap: 7px;
         column-gap: 0;
-        padding: 0 24px;
+        padding: 0 12px;
       }
       .hero__proof-item {
-        font-size: 8px;
-        letter-spacing: 0.11em;
-        padding: 0 10px;
+        font-size: clamp(7px, 2.4vw, 9px);
+        letter-spacing: 0.06em;
+        padding: 0 clamp(3px, 1.2vw, 6px);
       }
       .hero__proof-sep {
-        display: none;
+        display: block;
+        height: 9px;
       }
     }
 
@@ -378,7 +385,7 @@
     ─────────────────────────────────────────────────────────────────── */
     .hero__cta {
       position: absolute;
-      top: calc(44% + 10vw + 22px);
+      top: calc(44% + 10vw + 36px);
       left: 0;
       right: 0;
       z-index: 23;
@@ -442,20 +449,20 @@
     @media (max-width: 900px) {
       .hero__cta {
         /* Tightened from 36px — brings CTA closer to proof strip on tablet */
-        top: calc(42% + 12vw + 20px);
+        top: calc(42% + 12vw + 34px);
         gap: clamp(12px, 2vw, 24px);
       }
     }
     /* 480–767px: proof is 2 rows (~34px tall), ~4px gap below */
     @media (min-width: 480px) and (max-width: 767px) {
       .hero__cta {
-        top: calc(42% + 12vw + 38px);
+        top: calc(42% + 12vw + 52px);
       }
     }
     @media (max-width: 479px) {
       .hero__cta {
         /* proof is 2 rows (~29px), ~4px gap */
-        top: calc(38% + 15vw + 33px);
+        top: calc(38% + 15vw + 47px);
         flex-wrap: wrap;
         justify-content: center;
         gap: 6px 0;
@@ -1172,7 +1179,7 @@
     /* ─── PILL NAV ─────────────────────────────────── */
     .pill-nav-wrap {
       position: fixed;
-      top: 20px;
+      top: 16px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
@@ -1189,7 +1196,7 @@
       position: relative;
       display: flex;
       align-items: stretch;
-      height: 58px;
+      height: 48px;
       /* glassy: semi-transparent dark base + backdrop blur */
       background: rgba(14, 16, 26, 0.14);
       border: 1px solid rgba(255, 255, 255, 0.13);
@@ -1248,40 +1255,44 @@
         width     0.50s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* white highlight bar along the top edge of the active zone */
+    /* Soft highlight along the top edge of the active zone — single
+       centred peak that fades fully at both ends, so it never reads
+       as a hard bar or boundary. */
     .pill-nav__spot::before {
       content: '';
       position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 56%;
-      height: 1.5px;
+      width: 46%;
+      height: 1px;
       background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.90) 25%,
-        rgba(255, 255, 255, 0.90) 75%,
+        rgba(255, 255, 255, 0.55) 50%,
         transparent 100%
       );
     }
 
-    /* radial glow wash inside the active zone */
+    /* Radial glow wash inside the active zone. Horizontal radius kept
+       under 50% so the glow fades completely to transparent BEFORE it
+       reaches the item's left/right edges — no hard vertical edge, the
+       active state blends seamlessly into the surrounding nav glass. */
     .pill-nav__spot::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 85% 130% at 50% -10%,
-        rgba(255, 255, 255, 0.09) 0%,
-        rgba(255, 255, 255, 0.03) 55%,
-        transparent 100%
+      background: radial-gradient(ellipse 50% 125% at 50% 6%,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.035) 50%,
+        transparent 82%
       );
     }
 
     @media (max-width: 640px) {
-      .pill-nav-wrap { top: 16px; }
-      .pill-nav { height: 50px; }
-      .pill-nav__item { font-size: 10px; padding: 0 20px; letter-spacing: 0.07em; }
-      .pill-nav__cone { height: 44px; width: 130px; }
+      .pill-nav-wrap { top: 13px; }
+      .pill-nav { height: 44px; }   /* slimmer, still a comfortable tap target */
+      .pill-nav__item { font-size: 10px; padding: 0 18px; letter-spacing: 0.07em; }
+      .pill-nav__cone { height: 40px; width: 130px; }
     }
 
 
@@ -2146,6 +2157,27 @@
       font-weight: 400;
       line-height: 1.65;
       color: #fff;
+    }
+    /* Live typing caret — same behaviour/style as the footer paragraph,
+       reusing the shared ftCaret blink keyframe. */
+    .whyus__lede::after {
+      content: '';
+      display: inline-block;
+      width: 1.5px;
+      height: 0.85em;
+      background: var(--ft-cyan);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      opacity: 0;
+    }
+    .whyus__lede.ft-typing::after {
+      opacity: 1;
+      animation: ftCaret 0.65s ease infinite;
+    }
+    .whyus__lede.ft-typed::after {
+      animation: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
     }
 
     /* ── 2×2 quote grid (collapses to 1×4 on mobile) ──
@@ -3441,7 +3473,7 @@
       <div class="hero__proof" aria-label="Key features">
         <span class="hero__proof-item">Mobile-first</span>
         <span class="hero__proof-sep" aria-hidden="true"></span>
-        <span class="hero__proof-item">SEO-ready</span>
+        <span class="hero__proof-item">SEO</span>
         <span class="hero__proof-sep" aria-hidden="true"></span>
         <span class="hero__proof-item">Unlimited edits</span>
         <span class="hero__proof-sep" aria-hidden="true"></span>
@@ -4080,7 +4112,7 @@
   ═══════════════════════════════════════════════ -->
   <section class="whyus" id="whyus">
     <header class="whyus__head">
-      <p class="whyus__lede">90% of startups fail. Don't bet big, build smart. No templates, no shortcuts, just conversion focused solutions built to adapt and win. While others chase, you set the trap, strategic, sharp, and one step ahead.</p>
+      <p class="whyus__lede" id="whyusLede">90% of startups fail. Don't bet big, build smart. No templates, no shortcuts, just conversion focused solutions built to adapt and win. While others chase, you set the trap, strategic, sharp, and one step ahead.</p>
     </header>
 
     <!-- Composition wrapper. On mobile (< 901px) this lays out
@@ -4998,6 +5030,66 @@
   </script>
 
 
+
+  <!-- ── Quotations lede typing animation ────────────────────────
+       Same logic/feel as the footer paragraph typing: char-by-char
+       reveal with the cyan blinking caret, identical per-character
+       speed and punctuation pauses. Triggered once when the
+       paragraph scrolls into view. The paragraph's full height is
+       reserved up front so the quote grid below never shifts. ── -->
+  <script>
+    (function () {
+      var el = document.getElementById('whyusLede');
+      if (!el) return;
+
+      var fullText = el.textContent.trim();
+
+      /* Reserve the rendered height so emptying the text doesn't
+         collapse the box and shift the quote grid below it. */
+      el.style.minHeight = el.offsetHeight + 'px';
+      el.textContent = '';
+
+      var triggered = false;
+
+      function runTyping() {
+        var i = 0;
+        el.classList.add('ft-typing');
+        function tick() {
+          if (i < fullText.length) {
+            el.textContent = fullText.slice(0, i + 1);
+            i++;
+            var delay = 36 + Math.random() * 26;       /* same speed as footer */
+            var ch = fullText[i - 1];
+            if (ch === '.') delay += 110;
+            else if (ch === ',') delay += 60;
+            setTimeout(tick, delay);
+          } else {
+            setTimeout(function () {
+              el.classList.remove('ft-typing');
+              el.classList.add('ft-typed');
+            }, 600);
+          }
+        }
+        tick();
+      }
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting && !triggered) {
+              triggered = true;
+              io.disconnect();
+              runTyping();
+            }
+          });
+        }, { threshold: 0.4 });
+        io.observe(el);
+      } else {
+        /* No IntersectionObserver support — type immediately */
+        runTyping();
+      }
+    })();
+  </script>
 
   <!-- ── Footer paragraph typing animation ──────────────────────── -->
   <script>
